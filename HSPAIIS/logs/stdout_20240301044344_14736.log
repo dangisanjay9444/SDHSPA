@@ -1,0 +1,16 @@
+Unhandled exception. System.ArgumentNullException: Value cannot be null. (Parameter 'Password')
+   at Microsoft.Data.Common.ADP.CheckArgumentNull(Object value, String parameterName)
+   at Microsoft.Data.SqlClient.SqlConnectionStringBuilder.SetValue(String keyword, String value)
+   at Microsoft.Data.SqlClient.SqlConnectionStringBuilder.set_Password(String value)
+   at WebAPI.Startup.ConfigureServices(IServiceCollection services) in D:\SanjayDangi\Project\HSPA\WebAPI\Startup.cs:line 45
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Span`1& arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at Microsoft.AspNetCore.Hosting.ConfigureServicesBuilder.InvokeCore(Object instance, IServiceCollection services)
+   at Microsoft.AspNetCore.Hosting.ConfigureServicesBuilder.<>c__DisplayClass9_0.<Invoke>g__Startup|0(IServiceCollection serviceCollection)
+   at Microsoft.AspNetCore.Hosting.ConfigureServicesBuilder.Invoke(Object instance, IServiceCollection services)
+   at Microsoft.AspNetCore.Hosting.ConfigureServicesBuilder.<>c__DisplayClass8_0.<Build>b__0(IServiceCollection services)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostBuilder.UseStartup(Type startupType, HostBuilderContext context, IServiceCollection services, Object instance)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostBuilder.<>c__DisplayClass13_0.<UseStartup>b__0(HostBuilderContext context, IServiceCollection services)
+   at Microsoft.Extensions.Hosting.HostBuilder.CreateServiceProvider()
+   at Microsoft.Extensions.Hosting.HostBuilder.Build()
+   at WebAPI.Program.Main(String[] args) in D:\SanjayDangi\Project\HSPA\WebAPI\Program.cs:line 16

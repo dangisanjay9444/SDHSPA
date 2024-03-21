@@ -11,7 +11,7 @@ namespace WebAPI.DTOs
         public string Name { get; set; }
         
         [Required]
-        public int CountryID { get; set; }
+        public int CountryId { get; set; }
 
     }
 }

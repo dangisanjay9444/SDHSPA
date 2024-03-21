@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using WebAPI.DTOs;
 using WebAPI.Interfaces;
 using WebAPI.Models;
+using WebAPI.Errors;
+using WebAPI.Extensions;
 
 namespace WebAPI.Controllers
 {
@@ -30,9 +32,14 @@ namespace WebAPI.Controllers
         {
             var user = await Uow.userRepository.Authenticate(loginReqDTO.UserName, loginReqDTO.Password);
 
+            ApiError apiError = new ApiError();
+
             if (user == null)
-            {
-                return Unauthorized();
+            {   
+                apiError.ErrorCode = Unauthorized().StatusCode;
+                apiError.ErrorMessage = "Invalid UserID or Password !";
+                apiError.ErrorDetails = "This error appears when UserID or Password doesn't exist";
+                return Unauthorized(apiError);
             }
             else
             {
@@ -47,9 +54,20 @@ namespace WebAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register (LoginReqDTO loginReqDTO)
         {
+            ApiError apiError = new ApiError();
+
+            if (loginReqDTO.UserName.IsEmpty() || loginReqDTO.Password.IsEmpty())
+            {
+                apiError.ErrorCode = BadRequest().StatusCode;
+                apiError.ErrorMessage = "Username and Password is required to register";
+                return BadRequest(apiError);
+            }
+
             if(await Uow.userRepository.UserAlreadyExists(loginReqDTO.UserName))
             {
-                return BadRequest("UserName already exists please use another one");
+                apiError.ErrorCode = Unauthorized().StatusCode;
+                apiError.ErrorMessage = "UserName already exists please use another one";
+                return BadRequest(apiError);
             }
             else
             {

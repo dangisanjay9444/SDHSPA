@@ -18,5 +18,7 @@ namespace WebAPI.Models
         //to store the password in binary form to protect the password using the hashing and salting.
         public byte[] Password { get; set; }
         public byte[] PasswordKey { get; set; }
+        public string UserModified{get;set;}
+        public DateTime DateModified { get; set; } = DateTime.Now;
     }
 }

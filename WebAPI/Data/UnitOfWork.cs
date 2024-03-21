@@ -18,6 +18,16 @@ namespace WebAPI.Data
         public IUserRepository userRepository => 
             new UserRepository(dc);
 
+        public IPropertyRepository propertyRepository => 
+
+            new PropertyRepository(dc);
+
+        public IPropertyTypeRepository propertyTypeRepository => 
+           
+            new PropertyTypeRepository(dc);
+
+        public IFurnishingTypeRepository furnishingTypeRepository => 
+            new FurnishingTypeRepository(dc);
 
         public async Task<bool> SaveAsync()
         {

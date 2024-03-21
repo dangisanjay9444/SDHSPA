@@ -8,6 +8,7 @@ namespace WebAPI.Errors
 {
     public class ApiError
     {
+        public ApiError(){}
         public ApiError(int errorCode, string errorMessage, String errorDetails = null)
         {
             ErrorCode = errorCode;
@@ -20,7 +21,13 @@ namespace WebAPI.Errors
 
         public override string ToString()
         {
-            return JsonSerializer.Serialize(this);
+            // to set the ErrorMessage, ErrorCode, ErrorDetails in Camel Casing instead of pascal Casing
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            return JsonSerializer.Serialize(this,options);
         }
     }
 }

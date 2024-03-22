@@ -33,12 +33,21 @@ namespace WebAPI.Data.Repo
             .Include(p => p.City) // Include the City navigation property
                .ThenInclude(c => c.Country) // Then include the Country navigation property from City
             .Include(p => p.FurnishingType)
+            .Include(p => p.Photos)
             .Where(p => p.SellRent == sellRent)
             .ToListAsync();
             return properties;
         }
 
-        
+        public async Task<Property> GetPropertyByIdAsync(int id)
+        {
+            var properties = await dc.Properties
+            .Include(p => p.Photos)            
+            .Where(p => p.Id == id)
+            .FirstOrDefaultAsync();
+            return properties;
+        }
+
         public async Task<Property> GetPropertyDetailAsync(int id)
         {
             var properties = await dc.Properties
@@ -46,6 +55,7 @@ namespace WebAPI.Data.Repo
             .Include(p => p.City) // Include the City navigation property
                .ThenInclude(c => c.Country) // Then include the Country navigation property from City
             .Include(p => p.FurnishingType)
+            .Include(p => p.Photos)
             .Where(p => p.Id == id)
             .FirstAsync();
             return properties;

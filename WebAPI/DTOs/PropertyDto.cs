@@ -31,7 +31,7 @@ namespace WebAPI.DTOs
 
         public DateTime PostedOn { get; set; } =  DateTime.Now;
 
-         public int PostedBy { get; set; } = 5;
+         public int PostedBy { get; set; }
 
          public DateTime DateModified { get; set; } =  DateTime.Now;
 

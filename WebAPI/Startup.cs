@@ -25,6 +25,7 @@ using System.Globalization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Data.SqlClient;
+using WebAPI.Services;
 
 namespace WebAPI
 {
@@ -54,6 +55,7 @@ namespace WebAPI
             services.AddCors();
             //services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IPhotoService, PhotoService>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             var secretkey = Configuration.GetSection("AppSettings:Key").Value;
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretkey));

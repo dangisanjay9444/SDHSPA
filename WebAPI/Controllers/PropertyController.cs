@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using WebAPI.DTOs;
 using WebAPI.Interfaces;
 using WebAPI.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace WebAPI.Controllers
 {    
@@ -17,10 +18,12 @@ namespace WebAPI.Controllers
     {
         private readonly IUnitOfWork uow;
         private readonly IMapper mapper;
+        private readonly IPhotoService photoService;
 
-        public PropertyController(IUnitOfWork uow, IMapper mapper)
+        public PropertyController(IUnitOfWork uow, IMapper mapper, IPhotoService photoService)
         {
             this.mapper = mapper;
+            this.photoService = photoService;
             this.uow = uow;
         }
 
@@ -56,6 +59,133 @@ namespace WebAPI.Controllers
             uow.propertyRepository.AddProperty(property);
             await uow.SaveAsync();
             return StatusCode(201);
+        }
+
+        //api/Property/add/photo/1      
+        [HttpPost("add/photo/{propId}")]
+        [Authorize]
+        public async Task<IActionResult> AddPropertyPhoto(IFormFile file, int propId)
+        {
+            var result = await photoService.UploadPhotoAsync(file);
+            if(result.Error != null)
+            {
+                return BadRequest(result.Error.Message);
+            }
+
+            var property = await uow.propertyRepository.GetPropertyByIdAsync(propId);
+
+            var photo = new Photo
+            {
+                ImageUrl = result.SecureUrl.AbsoluteUri,
+                PublicId = result.PublicId
+            };
+
+            if(property.Photos.Count == 0)
+            {
+                photo.IsPrimary = true;
+            }
+
+            property.Photos.Add(photo);
+            await uow.SaveAsync();
+            return StatusCode(201);
+        }
+
+        //api/Property/set-primary-photo/1/publicid      
+        [HttpPost("set-primary-photo/{propId}/{publicId}")]
+        [Authorize]
+        public async Task<IActionResult> SetPrimaryPhoto(int propId, string publicId)
+        {
+            var userId =  GetUserId();
+
+            var property = await uow.propertyRepository.GetPropertyByIdAsync(propId);
+
+            if(property == null)
+            {
+                return BadRequest("No such property or photo exists !");
+            }
+
+            if(property.PostedBy != userId)
+            {
+                return BadRequest("You are not authorized to change the photo");
+            }
+
+            var photo = property.Photos.FirstOrDefault(p => p.PublicId == publicId);
+
+            if(photo == null)
+            {
+                return BadRequest("No such property or photo exists !");
+            }
+
+            if(photo.IsPrimary)
+            {
+                return BadRequest("The photo is already a primary photo !");
+            }    
+
+            var currentPrimary = property.Photos.FirstOrDefault(p => p.IsPrimary);
+            if(currentPrimary != null)
+            {
+                currentPrimary.IsPrimary = false;
+                photo.IsPrimary = true;
+            }
+
+            if(await uow.SaveAsync()) 
+            {
+                return NoContent();
+            }
+            else
+            {
+                return BadRequest("Some error has occured, failed to set primary photo");
+            }
+        }
+
+        //api/Property/delete-photo/1/publicid      
+        [HttpDelete("delete-photo/{propId}/{publicId}")]
+        [Authorize]
+        public async Task<IActionResult> DeletePhoto(int propId, string publicId)
+        {
+            var userId =  GetUserId();
+
+            var property = await uow.propertyRepository.GetPropertyByIdAsync(propId);
+
+            if(property == null)
+            {
+                return BadRequest("No such property or photo exists !");
+            }
+
+            if(property.PostedBy != userId)
+            {
+                return BadRequest("You are not authorized to delete the photo");
+            }
+
+            var photo = property.Photos.FirstOrDefault(p => p.PublicId == publicId);
+
+            if(photo == null)
+            {
+                return BadRequest("No such property or photo exists !");
+            }
+
+            if(photo.IsPrimary)
+            {
+                return BadRequest("You can't delete the primary photo !");
+            }    
+
+            // first delete the photo from cloud
+            var result = await photoService.DeletePhotoAsync(photo.PublicId);
+            if(result.Error != null)
+            {
+                return BadRequest(result.Error.Message);
+            }
+            // after deletion from cloud then delete the photo from database.
+            property.Photos.Remove(photo);
+
+            if(await uow.SaveAsync()) 
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Some error has occured, failed to delete the photo");
+            }
         }
     }
 }

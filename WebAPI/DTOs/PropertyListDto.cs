@@ -19,7 +19,7 @@ namespace WebAPI.DTOs
         public string Country { get; set; }
         public bool ReadyToMove { get; set; }
         public DateTime EstPossessionOn { get; set; }
-        public string Photo {get;set;}
+        public string Photo {get;set;}      
 
     }
 }
